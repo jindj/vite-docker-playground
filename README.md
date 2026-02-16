@@ -1,63 +1,49 @@
-# React + Vite
+# Docker pense-bête (Dev / Tests / Prod)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Quick commands
 
-Currently, two official plugins are available:
+- Lancer (build + up) : `docker compose up --build`
+- Logs : `docker compose logs -f`
+- Stop : `docker compose down`
+- Reset complet (supprime aussi node_modules en volume) : `docker compose down -v && docker compose up --build`
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Container (debug)
 
-## React Compiler
+- Voir containers actifs : `docker ps`
+- Voir aussi ceux arrêtés : `docker ps -a`
+- Logs d’un container : `docker logs <container>`
+- Shell dans un container : `docker exec -it <container> sh`
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+## Tests (Vitest)
 
-## Expanding the ESLint configuration
+- Lancer le service tests : `docker compose up --build test-app`
+- Si `vitest: not found` : reset volume `node_modules` → `docker compose down -v && docker compose up --build test-app`
+- Si tu ne vois pas `test-app` : normal (container “one-shot”) → `docker ps -a` + `docker logs test-app`
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Dev
 
----
+- Build image dev : `docker build -t myreact .`
+- Run dev (HMR + volumes) : `docker run --rm --name react-app -p 5173:5173 --mount type=bind,src="$(pwd)",target=/app --mount type=volume,target=/app/node_modules myreact`
+- Dev via compose : `docker compose up --build`
+- Logs dev : `docker compose logs -f`
+- Stop dev : `docker compose down`
+- Reset dev (⚠️ supprime aussi le volume node_modules) : `docker compose down -v && docker compose up --build`
 
-                                                                    DOCKER FROM SCRATCH
+## Prod
 
----
+- Build image prod : `docker build -t nginxreact -f Dockerfile.prod .`
+- Run prod : `docker run --rm -p 8080:80 nginxreact`
+- Prod via compose : `docker compose -f docker-compose.prod.yml up --build -d`
+- Logs prod : `docker compose -f docker-compose.prod.yml logs -f`
+- Stop prod : `docker compose -f docker-compose.prod.yml down`
 
-# Construction du Docker puis lancer un container depuis l'image
+## Nettoyage
 
-docker build -t myreact . && docker run -it -p 5173:5173 --name react-app myreact
+- Containers inutilisés : `docker container prune`
+- Volumes inutilisés : `docker volume prune`
+- Nettoyage complet (⚠️ agressif) : `docker system prune -a`
 
-docker build -t nginxreact -f Dockerfile.prod . # PROD
-docker run --rm -p 8080:80 nginxreact # RUN PROD
+## Rappels (pièges fréquents)
 
-# Live reload
-
-docker run --rm --name react-app-3 -p 5173:5173 --mount type=bind,src="$(pwd)",target=/app --mount type=volume,target=/app/node_modules myreact
-
-# Connection au container via sh
-
-docker exec -it react-app-3 sh
-
-# Commands
-
-docker compose -f docker-compose.prod.yml up --build -d
-docker compose -f docker-compose.prod.yml logs -f
-docker compose -f docker-compose.prod.yml down
-
-docker container/volume prune
-docker system prune -a
-docker compose down -v
-
----
-
-                                                                    DOCKER COMPOSE
-
----
-
-docker compose up -d / build
-
----
-
-                                                                    TESTS LIBS
-
----
-
-npm install --save-dev vitest @testing-library/react @testing-library/jest-dom jsdom
+- `docker ps` n’affiche que les containers en cours d’exécution (utilise `docker ps -a` pour voir les “Exited”).
+- Erreurs de permissions / EACCES en dev : souvent lié au volume `node_modules` → `docker compose down -v` puis relancer.
