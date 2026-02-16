@@ -37,6 +37,7 @@ docker exec -it react-app-3 sh
 
 docker container/volume prune
 docker system prune -a
+docker compose down -v
 
 ---
 

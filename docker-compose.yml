@@ -9,6 +9,19 @@ services:
     volumes:
       - .:/app
       - node_modules:/app/node_modules
+  test-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: test-app
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    command: ["npm", "run", "test"]
+
+    # When container's attached (docker attach test-app), run cmd
+    stdin_open: true
+    tty: true
 
 volumes:
   node_modules:
