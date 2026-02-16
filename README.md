@@ -25,6 +25,9 @@ If you are developing a production application, we recommend using TypeScript wi
 
 docker build -t myreact . && docker run -it -p 5173:5173 --name react-app myreact
 
+docker build -t nginxreact -f Dockerfile.prod . # PROD
+docker run --rm -p 8080:80 nginxreact # RUN PROD
+
 # Live reload
 
 docker run --rm --name react-app-3 -p 5173:5173 --mount type=bind,src="$(pwd)",target=/app --mount type=volume,target=/app/node_modules myreact
@@ -33,7 +36,11 @@ docker run --rm --name react-app-3 -p 5173:5173 --mount type=bind,src="$(pwd)",t
 
 docker exec -it react-app-3 sh
 
-# rm
+# Commands
+
+docker compose -f docker-compose.prod.yml up --build -d
+docker compose -f docker-compose.prod.yml logs -f
+docker compose -f docker-compose.prod.yml down
 
 docker container/volume prune
 docker system prune -a
