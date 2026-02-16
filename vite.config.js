@@ -9,4 +9,9 @@ export default defineConfig({
     host: true, // équivalent à --host
     port: 5173,
   },
+  test: {
+    globals: true,
+    environment: "jsdom",
+    setupFiles: "./src/setupTests.js",
+  },
 });

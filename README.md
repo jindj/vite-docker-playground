@@ -45,3 +45,11 @@ docker system prune -a
 ---
 
 docker compose up -d / build
+
+---
+
+                                                                    TESTS LIBS
+
+---
+
+npm install --save-dev vitest @testing-library/react @testing-library/jest-dom jsdom
