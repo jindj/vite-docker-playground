@@ -33,6 +33,15 @@ docker run --rm --name react-app-3 -p 5173:5173 --mount type=bind,src="$(pwd)",t
 
 docker exec -it react-app-3 sh
 
-# rm volumes
+# rm
 
 docker container/volume prune
+docker system prune -a
+
+---
+
+                                                                    DOCKER COMPOSE
+
+---
+
+docker compose up -d / build
